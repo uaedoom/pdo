@@ -61,6 +61,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `pytest` test suite (LLM mocked) and a GitHub Actions CI workflow.
 - Packaging via `pyproject.toml` with a `pdo` console-script entry point.
 
-[Unreleased]: https://github.com/your-org/pdo/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/your-org/pdo/compare/v0.1.0...v1.0.0
-[0.1.0]: https://github.com/your-org/pdo/releases/tag/v0.1.0
+[Unreleased]: https://github.com/uaedoom/pdo/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/uaedoom/pdo/compare/v0.1.0...v1.0.0
+[0.1.0]: https://github.com/uaedoom/pdo/releases/tag/v0.1.0

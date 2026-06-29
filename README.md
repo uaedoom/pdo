@@ -65,7 +65,7 @@ Requires **Python 3.12+**.
 
 ```bash
 # 1. Clone
-git clone https://github.com/your-org/pdo.git
+git clone https://github.com/uaedoom/pdo.git
 cd pdo
 
 # 2. Create a virtual environment

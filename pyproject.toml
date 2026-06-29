@@ -37,9 +37,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/your-org/pdo"
-Repository = "https://github.com/your-org/pdo"
-Issues = "https://github.com/your-org/pdo/issues"
+Homepage = "https://github.com/uaedoom/pdo"
+Repository = "https://github.com/uaedoom/pdo"
+Issues = "https://github.com/uaedoom/pdo/issues"
 
 # This is what makes `pdo` a real terminal command after installation.
 [project.scripts]

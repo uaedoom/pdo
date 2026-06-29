@@ -171,13 +171,13 @@ def _make_prompt_session(config: Config, agent: Agent, commands: dict[str, str])
         return HTML(f"  pdo  ·  <b>{config.openai_model}</b>  ·  {_short_cwd()}{tokens}  ")
 
     # complete_while_typing makes the dropdown appear immediately on "/".
-    # MULTI_COLUMN lays completions out in a grid so a long command list fits
-    # on screen instead of being clipped at the bottom; reserve room for it.
+    # Single-column menu (one command per line) with the descriptions; reserve
+    # extra rows so the list isn't clipped — scroll the rest with the arrow keys.
     return PromptSession(
         completer=completer,
         complete_while_typing=True,
-        complete_style=CompleteStyle.MULTI_COLUMN,
-        reserve_space_for_menu=8,
+        complete_style=CompleteStyle.COLUMN,
+        reserve_space_for_menu=14,
         bottom_toolbar=bottom_toolbar,
         style=Style.from_dict(_PTK_STYLE),
     )

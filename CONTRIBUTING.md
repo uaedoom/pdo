@@ -8,7 +8,7 @@ coding standards we follow, and how to extend the agent.
 Requires Python 3.12+.
 
 ```bash
-git clone https://github.com/your-org/pdo.git
+git clone https://github.com/uaedoom/pdo.git
 cd pdo
 python -m venv .venv
 source .venv/bin/activate

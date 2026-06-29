@@ -1,16 +1,16 @@
-# PDO — Python Do
+<h1 align="center">PDO — Python Do</h1>
 
-```
+<div align="center">
+<pre>
 ████████  ██████    ████████
 ██    ██  ██    ██  ██    ██
 ████████  ██    ██  ██    ██
 ██        ██    ██  ██    ██
 ██        ██████    ████████
-```
+</pre>
+</div>
 
-**Think. Plan. Do.**
-
-> The same pixel-art logo greets you on every launch.
+<p align="center"><b>Think. Plan. Do.</b><br/><sub>The same pixel-art logo greets you on every launch.</sub></p>
 
 PDO is a terminal-first AI agent that completes real tasks — it doesn't just
 answer questions. Give it a goal and it reasons about it, plans the steps,

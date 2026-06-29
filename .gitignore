@@ -1,0 +1,39 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# PDO runtime state (logs, memory, sessions — machine-specific / private)
+src/pdo/logs/*.log
+src/pdo/data/
+pdo-conversation-*.md
+
+# Local Claude Code settings and stray scratch dirs
+.claude/
+/xo/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

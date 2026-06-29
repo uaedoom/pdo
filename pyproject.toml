@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pdo"
+version = "1.0.0"
+description = "PDO (Python Do) — a terminal-first AI agent that reasons, plans, and safely executes real tasks."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "PDO Contributors" }]
+keywords = ["ai", "agent", "terminal", "cli", "llm", "openai", "automation"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Libraries :: Application Frameworks",
+  "Topic :: Utilities",
+]
+
+# Pin reasonable lower bounds; upper bounds are intentionally loose for v1.
+dependencies = [
+  "openai>=1.30,<2",
+  "python-dotenv>=1.0,<2",
+  "rich>=13.7,<14",
+  "pydantic>=2.6,<3",
+  "prompt_toolkit>=3.0,<4",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0,<9",
+  "ruff>=0.4",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-org/pdo"
+Repository = "https://github.com/your-org/pdo"
+Issues = "https://github.com/your-org/pdo/issues"
+
+# This is what makes `pdo` a real terminal command after installation.
+[project.scripts]
+pdo = "pdo.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# Ship only the system prompt. Runtime state (memory/history/logs) is created in
+# PDO_HOME at runtime and must NOT be bundled into the distribution.
+[tool.setuptools.package-data]
+pdo = ["prompts/*.md"]
+
+[tool.pytest.ini_options]
+# Allows `pytest` to find the package without an editable install.
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]

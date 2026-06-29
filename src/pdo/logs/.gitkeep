@@ -1,0 +1,3 @@
+# This directory holds PDO's rotating log files at runtime (pdo.log).
+# The .gitkeep keeps the directory in version control; the logs themselves are
+# ignored via .gitignore.

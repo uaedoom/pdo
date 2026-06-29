@@ -1,0 +1,8 @@
+# Convenience mirror of the runtime dependencies declared in pyproject.toml.
+# The canonical source of truth is pyproject.toml. Install the project with
+# `pip install -e .` (or `pip install -e .[dev]`) to also get the console script.
+openai>=1.30,<2
+python-dotenv>=1.0,<2
+rich>=13.7,<14
+pydantic>=2.6,<3
+prompt_toolkit>=3.0,<4

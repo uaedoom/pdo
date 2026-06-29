@@ -12,6 +12,15 @@
 
 <p align="center"><b>Think. Plan. Do.</b><br/><sub>The same pixel-art logo greets you on every launch.</sub></p>
 
+<p align="center">
+  <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-green.svg">
+  <img alt="Python 3.12+" src="https://img.shields.io/badge/Python-3.12%2B-blue.svg">
+  <img alt="Open Source" src="https://img.shields.io/badge/Open%20Source-%E2%9D%A4-red.svg">
+</p>
+
+> **PDO is free and open source** (MIT licensed). Contributions are welcome —
+> see [CONTRIBUTING.md](CONTRIBUTING.md). Star the repo if you find it useful! ⭐
+
 PDO is a terminal-first AI agent that completes real tasks — it doesn't just
 answer questions. Give it a goal and it reasons about it, plans the steps,
 decides whether tools are needed, executes them **safely**, reviews the result,
@@ -61,22 +70,46 @@ PDO Here are the Markdown files… and a three-line summary of the README…
 
 ## Installation
 
-Requires **Python 3.12+**.
+> [!IMPORTANT]
+> **PDO requires Python 3.12+.** Create the virtual environment with a 3.12
+> interpreter explicitly — don't rely on the system `python3` (macOS ships 3.9,
+> which will not work).
 
 ```bash
 # 1. Clone
 git clone https://github.com/uaedoom/pdo.git
 cd pdo
 
-# 2. Create a virtual environment
-python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+# 2. Create a virtual environment WITH Python 3.12+
+python3.12 -m venv .venv          # macOS (Homebrew): brew install python@3.12
+source .venv/bin/activate         # Windows: .venv\Scripts\activate
 
-# 3. Install (editable, with dev extras for tests/linting)
+# 3. Upgrade pip, then install (editable, with dev extras)
+python -m pip install --upgrade pip
 pip install -e ".[dev]"
 ```
 
-This installs the `pdo` console command.
+This installs the `pdo` console command. Verify with `python --version`
+(should be 3.12.x) and `pdo --version`.
+
+### Notes for users / troubleshooting
+
+- **`ERROR: ... Directory cannot be installed in editable mode` / "requires a
+  setuptools-based build"** — your virtual environment is on an old Python (and
+  old pip). Recreate it with Python 3.12 and upgrade pip:
+  ```bash
+  deactivate; rm -rf .venv
+  python3.12 -m venv .venv && source .venv/bin/activate
+  python -m pip install --upgrade pip
+  pip install -e ".[dev]"
+  ```
+- **No `python3.12`?** Install it first: macOS `brew install python@3.12`,
+  Ubuntu `sudo apt install python3.12 python3.12-venv`.
+- **Not yet on PyPI** — install by cloning as above (`pip install pdo` isn't
+  available yet).
+- **Tested on macOS and Linux.** Windows should work but is less tested.
+- Runtime data (memory, sessions, logs) lives in `~/.pdo` if you set
+  `PDO_HOME=~/.pdo`; otherwise it defaults to the package directory.
 
 ---
 

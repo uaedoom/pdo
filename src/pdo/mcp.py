@@ -176,9 +176,33 @@ class MCPTool(Tool):
 
     def run(self, **kwargs: Any) -> str:
         try:
-            return self._server.call_tool(self._mcp_name, kwargs)
+            return self._server.call_tool(self._mcp_name, self._clean_args(kwargs))
         except MCPError as exc:
             return f"Error: {exc}"
+
+    def _clean_args(self, kwargs: dict[str, Any]) -> dict[str, Any]:
+        """Drop blank optional arguments.
+
+        Smaller models often pad optional parameters with junk like ``" "``,
+        ``"/"`` or ``[]``, which some MCP servers reject (e.g. Canva fails on a
+        meaningless ``brand_kit_id``). For any argument not required by the tool's
+        schema, we drop None, empty collections, and strings with no alphanumeric
+        characters (a real id/value always contains letters or digits).
+        """
+        required = set(self.parameters.get("required", []) or [])
+        cleaned: dict[str, Any] = {}
+        for key, value in kwargs.items():
+            if key in required:
+                cleaned[key] = value
+                continue
+            if value is None:
+                continue
+            if isinstance(value, str) and not any(ch.isalnum() for ch in value):
+                continue
+            if isinstance(value, (list, dict)) and len(value) == 0:
+                continue
+            cleaned[key] = value
+        return cleaned
 
 
 def load_mcp_config(path: Path) -> dict[str, dict]:

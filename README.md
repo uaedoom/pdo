@@ -360,6 +360,33 @@ Servers start on launch (over the stdio transport); run `/mcp` to see what's
 connected. A server that fails to start is reported and skipped — it never
 crashes PDO. No extra Python dependencies are required.
 
+### PDO *as* an MCP server / SDK
+
+It works both ways — `pdo --serve` exposes the whole agent as an **MCP server**
+over stdio, so Claude Desktop, Claude Code, or any MCP client can call its
+`run_task` tool and get back the agent's final answer (with all of PDO's tools,
+sub-agents, and codebase search behind it). For example, in a client's
+`mcp.json`:
+
+```json
+{ "mcpServers": { "pdo": { "command": "pdo", "args": ["--serve"] } } }
+```
+
+In serve mode nothing is printed to stdout and interactive confirmations are
+auto-denied (dangerous commands are refused rather than prompted).
+
+And from Python scripts, embed the agent directly:
+
+```python
+from pdo import run_agent
+
+answer = run_agent("list the markdown files here and summarise the README")
+```
+
+`run_agent` accepts overrides (`model=`, `base_url=`, `api_key=`,
+`temperature=`, or a custom `llm=` client) and uses an ephemeral memory so it
+never touches your interactive sessions.
+
 ---
 
 ## Roadmap

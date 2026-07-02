@@ -230,6 +230,11 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
     )
     parser.add_argument("prompt", nargs="*", help="Run a single prompt and exit (one-shot mode).")
     parser.add_argument("--version", action="store_true", help="Print the version and exit.")
+    parser.add_argument(
+        "--serve",
+        action="store_true",
+        help="Run as an MCP server over stdio (exposes a run_task tool).",
+    )
     parser.add_argument("--json", action="store_true", help="One-shot: print the reply as JSON.")
     parser.add_argument("--no-markdown", action="store_true", help="Disable Markdown rendering.")
     parser.add_argument("--theme", metavar="NAME", help=f"Color theme: {', '.join(theme_names())}.")
@@ -271,8 +276,12 @@ def main(argv: list[str] | None = None) -> int:
         console.print(f"[red]Failed to initialise the LLM client:[/red] {exc}")
         return 1
 
-    mcp_servers = _init_mcp(registry, quiet=args.prompt and args.json)
+    mcp_servers = _init_mcp(registry, quiet=args.serve or (args.prompt and args.json))
     try:
+        # Serve mode: stdio JSON-RPC (PDO as an MCP server).
+        if args.serve:
+            return _run_serve(config, llm, registry)
+
         # One-shot mode: run a single prompt and exit (great for scripts/pipes).
         if args.prompt:
             return _run_once(config, llm, registry, store, " ".join(args.prompt), args.json)
@@ -304,6 +313,29 @@ def _init_mcp(registry: ToolRegistry, quiet: bool = False):
             else:
                 console.print(f"[dim]MCP {name}: connected ({count} tool(s))[/dim]")
     return servers
+
+
+def _run_serve(config: Config, llm: OpenAIClient, registry: ToolRegistry) -> int:
+    """Run PDO as an MCP server over stdio (never writes UI output to stdout)."""
+    import tempfile
+
+    from .agent.memory import MemoryStore as _MemoryStore
+    from .serve import PDOServer
+    from .tools.base import set_confirm_override
+
+    # stdout carries JSON-RPC: refuse anything that would prompt interactively.
+    set_confirm_override(lambda _prompt: False)
+
+    memory = _MemoryStore(Path(tempfile.mkdtemp(prefix="pdo-serve-")))
+    agent = Agent(config, llm, registry, memory, planning=False)
+    logger.info("Serving PDO over stdio (MCP); model=%s", config.openai_model)
+    try:
+        PDOServer(agent).serve_forever(sys.stdin, sys.stdout)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        set_confirm_override(None)
+    return 0
 
 
 def _run_once(

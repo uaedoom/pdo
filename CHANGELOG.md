@@ -7,6 +7,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- Serve mode: `pdo --serve` exposes the agent as an MCP server over stdio with
+  a `run_task` tool, so Claude Desktop/Code or any MCP client can drive PDO.
+  Confirmations are auto-denied and stdout stays protocol-clean.
+- Python embedding API: `from pdo import run_agent` runs one task through the
+  agent (env config with keyword overrides, ephemeral memory, injectable LLM).
 - Codebase retrieval: `/index` builds a BM25 lexical index of the current
   directory and a `codebase_search` tool returns the most relevant chunks with
   `path:line` references (auto-builds on first use; no embeddings endpoint or

@@ -17,6 +17,18 @@ logger = logging.getLogger(__name__)
 _console = Console()
 
 
+# Process-wide confirmation override. Non-interactive modes (e.g. `pdo --serve`,
+# where stdin/stdout carry JSON-RPC) install a handler here so confirmation can
+# never block on, or write to, the protocol streams.
+_confirm_override: Any = None
+
+
+def set_confirm_override(handler) -> None:
+    """Replace interactive confirmation globally (None restores the default)."""
+    global _confirm_override
+    _confirm_override = handler
+
+
 def default_confirm(prompt: str) -> bool:
     """Ask the user to type ``y`` to approve a sensitive action.
 
@@ -24,6 +36,8 @@ def default_confirm(prompt: str) -> bool:
     proceed". Tools accept this as an injectable dependency so tests can supply
     a deterministic callback instead of blocking on real input.
     """
+    if _confirm_override is not None:
+        return bool(_confirm_override(prompt))
     _console.print(f"[yellow]{prompt}[/yellow]")
     try:
         answer = _console.input("Type 'y' to confirm: ")

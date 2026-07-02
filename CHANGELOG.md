@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- Sub-agents: a `delegate_task` tool lets the agent hand a self-contained
+  subtask to a fresh child agent (same tools minus delegation, ephemeral
+  memory, depth-capped); the child's token usage is folded into the session
+  totals and its tool activity stays visible.
 - Multi-line input: Option/Alt+Enter inserts a newline; Enter sends.
 - Image attachments: `@image.png` in a message sends the image to
   vision-capable models (png/jpg/gif/webp, as base64 data URLs).

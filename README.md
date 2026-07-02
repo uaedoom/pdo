@@ -55,7 +55,10 @@ PDO Here are the Markdown files… and a three-line summary of the README…
   - **MCP** — connect any Model Context Protocol server; its tools appear as
     `mcp__<server>__<tool>`.
 - **Conversation management** — named **sessions** (`/new`, `/resume`), automatic
-  **summarisation** of long history, `@file` references, and `/export`.
+  **summarisation** of long history, `@file` references (text **and images** for
+  vision models), and `/export`.
+- **Sub-agents** — a `delegate_task` tool spawns a fresh child agent for
+  self-contained subtasks, keeping the main context small on big jobs.
 - **Safety & control** — typed confirmation for destructive commands, working-dir
   write sandbox, per-tool **permission policies**, and a structured **audit log**.
 - **Polished terminal UX** — pixel-art splash, a bordered input box with slash

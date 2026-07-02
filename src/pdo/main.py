@@ -97,6 +97,7 @@ _TOOL_VERBS: dict[str, str] = {
     "memory_save": "Saved",
     "memory_search": "Searched",
     "memory_delete": "Deleted",
+    "delegate_task": "Delegated",
 }
 
 console = Console()

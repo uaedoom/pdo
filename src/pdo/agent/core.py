@@ -57,6 +57,7 @@ class Agent:
         on_tool: Callable[[str, dict], None] | None = None,
         on_tool_result: Callable[[str, str], None] | None = None,
         planning: bool = True,
+        depth: int = 0,
     ) -> None:
         self._config = config
         self._llm = llm
@@ -74,13 +75,58 @@ class Agent:
         self._on_tool = on_tool or (lambda _name, _args: None)
         self._on_tool_result = on_tool_result or (lambda _name, _result: None)
         self._planning = planning
+        self._depth = depth
         self._system_prompt = _load_system_prompt()
         # Running token totals for the session (shown in the UI footer).
         self._usage = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        # Only the top-level agent may delegate; children get a registry
+        # without the delegate tool, so delegation cannot recurse unbounded.
+        if depth == 0 and not registry.has("delegate_task"):
+            from .delegate import DelegateTool
+
+            registry.register(DelegateTool(self))
 
     def token_usage(self) -> dict[str, int]:
         """Return cumulative token usage for the session."""
         return dict(self._usage)
+
+    def run_subtask(self, task: str, context: str = "") -> str:
+        """Run ``task`` in a fresh child agent and return its final answer.
+
+        The child gets the same tools (minus delegation), an ephemeral memory,
+        and no streaming; its token usage is folded into this agent's totals.
+        """
+        from .delegate import MAX_DELEGATION_DEPTH
+
+        if self._depth >= MAX_DELEGATION_DEPTH:
+            return "Error: maximum delegation depth reached; do the task yourself."
+
+        import tempfile
+
+        child_registry = ToolRegistry()
+        for tool in self._registry.all():
+            if tool.name != "delegate_task":
+                child_registry.register(tool)
+
+        child = Agent(
+            self._config,
+            self._llm,
+            child_registry,
+            MemoryStore(Path(tempfile.mkdtemp(prefix="pdo-subagent-"))),
+            on_tool=self._on_tool,  # nested tool activity stays visible
+            on_tool_result=self._on_tool_result,
+            planning=False,
+            depth=self._depth + 1,
+        )
+        prompt = f"{task}\n\nContext:\n{context}" if context.strip() else task
+        try:
+            answer = child.run_turn(prompt)
+        except Exception as exc:  # noqa: BLE001 — a failed subtask must not kill the parent
+            logger.exception("Sub-agent failed")
+            answer = f"Error: sub-agent failed: {exc}"
+        for key in self._usage:
+            self._usage[key] += child.token_usage().get(key, 0)
+        return answer
 
     def set_llm(self, llm: LLMClient) -> None:
         """Swap the active language model (used by the ``/models`` command)."""

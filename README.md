@@ -324,6 +324,14 @@ pdo            # now type:  /review the auth module
 In any message, mention a file with `@path` and PDO inlines its contents for the
 model — e.g. `explain @src/pdo/main.py` or `fix the bug in @app.py`.
 
+**Images too:** `@screenshot.png` (png/jpg/gif/webp) attaches the image itself,
+so vision-capable models can see it — e.g. `what's wrong in this UI? @shot.png`.
+
+### Multi-line input
+
+Press **Enter** to send. Press **Option/Alt+Enter** (⌥⏎) to insert a newline and
+compose a multi-line message before sending.
+
 ### MCP servers (Model Context Protocol)
 
 PDO is an MCP client: connect any MCP server and its tools become available to

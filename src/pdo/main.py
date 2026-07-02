@@ -59,6 +59,7 @@ try:
     from prompt_toolkit import PromptSession
     from prompt_toolkit.completion import Completer, Completion
     from prompt_toolkit.formatted_text import HTML
+    from prompt_toolkit.key_binding import KeyBindings
     from prompt_toolkit.shortcuts import CompleteStyle
     from prompt_toolkit.styles import Style
 
@@ -168,7 +169,18 @@ def _make_prompt_session(config: Config, agent: Agent, commands: dict[str, str])
         # Read live each time so /models and token counts update immediately.
         total = agent.token_usage().get("total_tokens", 0)
         tokens = f"  ·  {total:,} tok" if total else ""
-        return HTML(f"  pdo  ·  <b>{config.openai_model}</b>  ·  {_short_cwd()}{tokens}  ")
+        return HTML(
+            f"  pdo  ·  <b>{config.openai_model}</b>  ·  {_short_cwd()}{tokens}"
+            "  ·  ⌥⏎ newline  "
+        )
+
+    # Enter submits; Alt/Option+Enter (ESC then Enter) inserts a newline so
+    # multi-line prompts can be composed without sending.
+    bindings = KeyBindings()
+
+    @bindings.add("escape", "enter")
+    def _insert_newline(event):
+        event.current_buffer.insert_text("\n")
 
     # complete_while_typing makes the dropdown appear immediately on "/".
     # Single-column menu (one command per line) with the descriptions; reserve
@@ -179,6 +191,7 @@ def _make_prompt_session(config: Config, agent: Agent, commands: dict[str, str])
         complete_style=CompleteStyle.COLUMN,
         reserve_space_for_menu=14,
         bottom_toolbar=bottom_toolbar,
+        key_bindings=bindings,
         style=Style.from_dict(_PTK_STYLE),
     )
 
@@ -200,6 +213,8 @@ def _read_input(session) -> str:
                 f"<{accent_ansi()}><b>› </b></{accent_ansi()}>"
             ),
             rprompt=HTML("<ansibrightblack>│</ansibrightblack>"),
+            # Continuation rows (after Alt+Enter) keep the box's left border.
+            prompt_continuation=HTML("<ansibrightblack>│</ansibrightblack>   "),
         )
     finally:
         console.print(f"[grey42]╰{'─' * inner}╯[/grey42]")
@@ -300,7 +315,8 @@ def _run_once(
     """Run a single prompt non-interactively and print the result."""
     agent = _build_agent(config, llm, registry, store, quiet=True)
     try:
-        answer = agent.run_turn(prompt)
+        expanded, images = _expand_file_refs(prompt)
+        answer = agent.run_turn(expanded, images=images)
     except Exception as exc:  # noqa: BLE001
         if as_json:
             print(json.dumps({"error": str(exc)}))
@@ -384,9 +400,9 @@ class _AgentWithReset(Agent):
         )
         self._state = state
 
-    def run_turn(self, user_input: str) -> str:
+    def run_turn(self, user_input: str, images: list[str] | None = None) -> str:
         self._state["label_shown"] = False
-        return super().run_turn(user_input)
+        return super().run_turn(user_input, images=images)
 
 
 def _show_splash(config: Config) -> None:
@@ -443,38 +459,55 @@ def _repl(
                 return 0
             continue
 
-        _run_turn_interactive(agent, config, _expand_file_refs(user_input))
+        expanded, images = _expand_file_refs(user_input)
+        _run_turn_interactive(agent, config, expanded, images)
 
 
-def _expand_file_refs(text: str) -> str:
-    """Inline the contents of any existing ``@path`` references in the message."""
+# File extensions treated as image attachments (sent to vision models).
+_IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".gif", ".webp"}
+
+
+def _expand_file_refs(text: str) -> tuple[str, list[str]]:
+    """Resolve ``@path`` references: inline text files, collect image paths.
+
+    Returns the (possibly expanded) message text and a list of image file paths
+    to attach to the turn for vision-capable models.
+    """
     attachments: list[tuple[str, str]] = []
+    images: list[str] = []
     for match in _FILE_REF.finditer(text):
         path = Path(match.group(1)).expanduser()
-        if path.is_file():
-            try:
-                attachments.append((str(path), truncate(path.read_text("utf-8", "ignore"), 8000)))
-            except OSError:
-                continue
+        if not path.is_file():
+            continue
+        if path.suffix.lower() in _IMAGE_EXTS:
+            images.append(str(path.resolve()))
+            continue
+        try:
+            attachments.append((str(path), truncate(path.read_text("utf-8", "ignore"), 8000)))
+        except OSError:
+            continue
+    if attachments or images:
+        console.print(f"[dim]📎 attached {len(attachments) + len(images)} file(s)[/dim]")
     if not attachments:
-        return text
-    console.print(f"[dim]📎 attached {len(attachments)} file(s)[/dim]")
+        return text, images
     blocks = "\n\n".join(f"[Attached file: {p}]\n```\n{c}\n```" for p, c in attachments)
-    return f"{text}\n\n{blocks}"
+    return f"{text}\n\n{blocks}", images
 
 
-def _run_turn_interactive(agent: Agent, config: Config, user_input: str) -> None:
+def _run_turn_interactive(
+    agent: Agent, config: Config, user_input: str, images: list[str] | None = None
+) -> None:
     """Run one turn with a thinking spinner and (optionally) Markdown rendering."""
     try:
         if config.render_markdown:
             # Tokens aren't streamed in this mode; show a spinner while the agent
             # works (tool-activity lines still print live), then render the reply.
             with console.status(f"[{accent()}]Thinking…[/{accent()}]", spinner="dots"):
-                answer = agent.run_turn(user_input)
+                answer = agent.run_turn(user_input, images=images)
             console.print()
             console.print(Markdown(answer))
         else:
-            agent.run_turn(user_input)  # raw token streaming
+            agent.run_turn(user_input, images=images)  # raw token streaming
     except KeyboardInterrupt:
         console.print("\n[dim]⏹ Cancelled.[/dim]")
     except LLMError as exc:
@@ -535,7 +568,8 @@ def _handle_command(
         if name in skills:
             parts = command.split(maxsplit=1)
             rendered = skills[name].render(parts[1].strip() if len(parts) > 1 else "")
-            _run_turn_interactive(agent, config, _expand_file_refs(rendered))
+            expanded, images = _expand_file_refs(rendered)
+            _run_turn_interactive(agent, config, expanded, images)
         else:
             console.print(f"[yellow]Unknown command:[/yellow] {command}  (try /help)")
     return False

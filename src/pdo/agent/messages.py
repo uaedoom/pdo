@@ -41,7 +41,9 @@ class Message:
     """
 
     role: str  # "system" | "user" | "assistant" | "tool"
-    content: str | None = None
+    # Either plain text or OpenAI multi-part content (e.g. text + image_url
+    # parts for vision models); lists are passed through to the API unchanged.
+    content: str | list[dict[str, Any]] | None = None
     tool_calls: list[ToolCall] = field(default_factory=list)
     tool_call_id: str | None = None  # set on tool-result messages
     name: str | None = None  # tool name, set on tool-result messages

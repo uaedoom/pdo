@@ -87,8 +87,13 @@ class Agent:
         self._llm = llm
         self._planner = Planner(llm)
 
-    def run_turn(self, user_input: str) -> str:
-        """Process one user turn and return the final (also streamed) answer."""
+    def run_turn(self, user_input: str, images: list[str] | None = None) -> str:
+        """Process one user turn and return the final (also streamed) answer.
+
+        ``images`` is an optional list of local image file paths attached to
+        this turn; they are sent to the model as data-URL image parts (only
+        vision-capable models will make use of them).
+        """
         decision = self._router.route(user_input)
 
         plan: list[str] = []
@@ -98,6 +103,15 @@ class Agent:
         self._memory.add_message("user", user_input)
         self._maybe_summarize()
         messages = self._build_messages(plan)
+        if images:
+            # The last built message is this turn's user text (just persisted);
+            # replace it with multi-part content carrying the encoded images.
+            parts: list[dict] = [{"type": "text", "text": user_input}]
+            for path in images:
+                encoded = _encode_image(path)
+                if encoded:
+                    parts.append({"type": "image_url", "image_url": {"url": encoded}})
+            messages[-1] = Message(role="user", content=parts)
         tools = self._registry.schemas() if decision.expose_tools else None
 
         final = ""
@@ -180,6 +194,31 @@ class Agent:
             logger.exception("Summarisation failed; keeping full history")
             return ""
         return (response.content or "").strip()
+
+
+_IMAGE_MIME = {
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".webp": "image/webp",
+}
+
+
+def _encode_image(path: str) -> str | None:
+    """Encode a local image file as a base64 data URL, or None on failure."""
+    import base64
+
+    file = Path(path).expanduser()
+    mime = _IMAGE_MIME.get(file.suffix.lower())
+    if mime is None or not file.is_file():
+        return None
+    try:
+        data = base64.b64encode(file.read_bytes()).decode("ascii")
+    except OSError:
+        logger.warning("Could not read image %s", path)
+        return None
+    return f"data:{mime};base64,{data}"
 
 
 def _safe_args(raw: str) -> dict:

@@ -6,6 +6,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- Multi-line input: Option/Alt+Enter inserts a newline; Enter sends.
+- Image attachments: `@image.png` in a message sends the image to
+  vision-capable models (png/jpg/gif/webp, as base64 data URLs).
+- `@file` references now also work in one-shot mode.
+
 ## [1.0.0] - 2026-06-29
 
 ### Added

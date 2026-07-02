@@ -391,16 +391,22 @@ never touches your interactive sessions.
 
 ## Roadmap
 
-**v1 (this release) — done**
+**v1 — done**
 - Native tool-calling agent loop; multi-provider (OpenAI / Anthropic / OpenRouter
   / Ollama); 18 built-in tools; plugins, skills, and MCP client; named sessions +
   auto-summary; permission policies + audit log; themed TUI with one-shot/JSON
   modes; tests + CI; Docker.
 
+**v2 (this release) — done**
+- Multi-line input and image/vision attachments (`@image.png`).
+- Sub-agents (`delegate_task`) and codebase retrieval (`/index` +
+  `codebase_search`, BM25 — fully offline).
+- `pdo --serve` (PDO as an MCP server) and the `run_agent` Python API.
+
 **Next**
-- Multi-line input and image/vision input.
-- Sub-agents (delegate subtasks) and retrieval (RAG over large codebases).
-- A JSON-RPC / SDK mode so other apps can embed PDO.
+- Embedding-based retrieval as an optional upgrade to the BM25 index.
+- Streamed responses inside serve mode; richer sub-agent orchestration.
+- PyPI publication and a Homebrew formula.
 
 Each of these arrives as a new `Tool` (or `LLMClient`) — by design, none require
 changes to the core.

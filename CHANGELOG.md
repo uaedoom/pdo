@@ -8,6 +8,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [2.0.0] - 2026-07-02
 
+### Changed
+- Published to PyPI as **`pdo-agent`** (the name `pdo` is reserved on PyPI);
+  the `pdo` command and `import pdo` are unchanged.
+
 ### Added
 - Serve mode: `pdo --serve` exposes the agent as an MCP server over stdio with
   a `run_task` tool, so Claude Desktop/Code or any MCP client can drive PDO.

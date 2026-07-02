@@ -81,6 +81,18 @@ PDO Here are the Markdown files… and a three-line summary of the README…
 > interpreter explicitly — don't rely on the system `python3` (macOS ships 3.9,
 > which will not work).
 
+### From PyPI (easiest)
+
+```bash
+python3.12 -m venv .venv && source .venv/bin/activate
+pip install pdo-agent            # installs the `pdo` command
+```
+
+(The PyPI distribution is named `pdo-agent`; the command and the import are
+still `pdo`.)
+
+### From source (for development)
+
 ```bash
 # 1. Clone
 git clone https://github.com/uaedoom/pdo.git
@@ -111,8 +123,8 @@ This installs the `pdo` console command. Verify with `python --version`
   ```
 - **No `python3.12`?** Install it first: macOS `brew install python@3.12`,
   Ubuntu `sudo apt install python3.12 python3.12-venv`.
-- **Not yet on PyPI** — install by cloning as above (`pip install pdo` isn't
-  available yet).
+- **On PyPI as `pdo-agent`** — `pip install pdo` will NOT work (that name is
+  reserved on PyPI); use `pip install pdo-agent`.
 - **Tested on macOS and Linux.** Windows should work but is less tested.
 - Runtime data (memory, sessions, logs) lives in `~/.pdo` if you set
   `PDO_HOME=~/.pdo`; otherwise it defaults to the package directory.
@@ -406,7 +418,7 @@ never touches your interactive sessions.
 **Next**
 - Embedding-based retrieval as an optional upgrade to the BM25 index.
 - Streamed responses inside serve mode; richer sub-agent orchestration.
-- PyPI publication and a Homebrew formula.
+- A Homebrew formula. (Already on PyPI as [`pdo-agent`](https://pypi.org/project/pdo-agent/).)
 
 Each of these arrives as a new `Tool` (or `LLMClient`) — by design, none require
 changes to the core.

@@ -3,7 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pdo"
+# PyPI distribution name (the name "pdo" is reserved on PyPI). The import
+# package and the `pdo` console command are unchanged.
+name = "pdo-agent"
 version = "2.0.0"
 description = "PDO (Python Do) — a terminal-first AI agent that reasons, plans, and safely executes real tasks."
 readme = "README.md"

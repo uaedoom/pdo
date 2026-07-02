@@ -109,6 +109,7 @@ _COMMANDS: dict[str, str] = {
     "/help": "Show this help",
     "/models": "Switch provider and model (OpenAI / Anthropic / OpenRouter / Ollama)",
     "/tools": "List available tools",
+    "/index": "Build/refresh the codebase search index for this directory",
     "/mcp": "Show connected MCP servers and their tools",
     "/theme": "Change the color theme (e.g. /theme green)",
     "/export": "Save the conversation to a Markdown file",
@@ -556,6 +557,8 @@ def _handle_command(
         _print_tools(registry)
     elif cmd == "/mcp":
         _print_mcp()
+    elif cmd == "/index":
+        _handle_index()
     elif cmd == "/memory":
         _print_memory(store)
     elif cmd == "/history":
@@ -590,6 +593,19 @@ def _handle_theme(command: str, config: Config) -> None:
         console.print(f"[{accent()}]✓ Theme set to {name}.[/{accent()}]")
     else:
         console.print(f"[yellow]Unknown theme {name!r}.[/yellow] Available: {available}")
+
+
+def _handle_index() -> None:
+    """(Re)build the BM25 codebase index for the current directory."""
+    from .rag import build_index
+
+    with console.status(f"[{accent()}]Indexing…[/{accent()}]", spinner="dots"):
+        index = build_index(Path.cwd())
+    files = len({chunk.path for chunk in index.chunks})
+    console.print(
+        f"[green]✓ Indexed[/green] {files} file(s) into {len(index.chunks)} chunk(s). "
+        "The agent can now use codebase_search."
+    )
 
 
 def _print_sessions(store: MemoryStore) -> None:

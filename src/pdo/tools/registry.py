@@ -87,6 +87,7 @@ def get_registry() -> ToolRegistry:
                     filesystem,
                     git,
                     memory,
+                    rag,
                     search,
                     shell,
                     web,

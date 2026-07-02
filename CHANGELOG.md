@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- Codebase retrieval: `/index` builds a BM25 lexical index of the current
+  directory and a `codebase_search` tool returns the most relevant chunks with
+  `path:line` references (auto-builds on first use; no embeddings endpoint or
+  extra dependencies required).
 - Sub-agents: a `delegate_task` tool lets the agent hand a self-contained
   subtask to a fresh child agent (same tools minus delegation, ephemeral
   memory, depth-capped); the child's token usage is folded into the session

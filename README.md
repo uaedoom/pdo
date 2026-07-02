@@ -59,6 +59,9 @@ PDO Here are the Markdown files… and a three-line summary of the README…
   vision models), and `/export`.
 - **Sub-agents** — a `delegate_task` tool spawns a fresh child agent for
   self-contained subtasks, keeping the main context small on big jobs.
+- **Codebase search** — `/index` builds a local BM25 index of your project; the
+  agent then uses `codebase_search` to find relevant code with `path:line` refs
+  (no embeddings API needed — works fully offline).
 - **Safety & control** — typed confirmation for destructive commands, working-dir
   write sandbox, per-tool **permission policies**, and a structured **audit log**.
 - **Polished terminal UX** — pixel-art splash, a bordered input box with slash

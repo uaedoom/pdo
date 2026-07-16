@@ -41,7 +41,7 @@ PDO Here are the Markdown files… and a three-line summary of the README…
 - **ReAct-style agent loop** built on the LLM's **native function/tool calling** —
   the model picks tools and arguments; PDO executes them and feeds results back
   until the task is done. Tool calls are never parsed out of free text.
-- **Many providers** — OpenAI, Anthropic, OpenRouter, local **Ollama**, or any
+- **Many providers** — OpenAI, Anthropic, **Google Gemini**, OpenRouter, local **Ollama**, or any
   OpenAI-compatible endpoint. Switch provider and model at runtime with `/models`
   (live model listing). The core depends only on an `LLMClient` interface.
 - **18 built-in tools** — filesystem (read / write / append / **edit** / list /
@@ -200,7 +200,7 @@ you ▸ create a README for this project
 | Command     | What it does                          |
 | ----------- | ------------------------------------- |
 | `/help`     | Show available commands               |
-| `/models`   | Switch provider & model (OpenAI / Anthropic / OpenRouter / Ollama) |
+| `/models`   | Switch provider & model (OpenAI / Anthropic / Gemini / OpenRouter / Ollama) |
 | `/tools`    | List registered tools                 |
 | `/mcp`      | Show connected MCP servers and their tools |
 | `/theme`    | Change the color theme (e.g. `/theme green`) |

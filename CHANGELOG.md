@@ -6,6 +6,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- Google Gemini as a provider in `/models` (via Google's OpenAI-compatible
+  endpoint; set `GEMINI_API_KEY`).
+
 ## [2.0.0] - 2026-07-02
 
 ### Changed

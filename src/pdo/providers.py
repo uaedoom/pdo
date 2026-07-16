@@ -53,6 +53,19 @@ PROVIDERS: dict[str, Provider] = {
             "claude-3-5-haiku-latest",
         ],
     ),
+    "gemini": Provider(
+        key="gemini",
+        label="Google (Gemini)",
+        env_key="GEMINI_API_KEY",
+        # Google's OpenAI-compatibility endpoint for the Gemini API.
+        base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+        models=[
+            "gemini-2.5-flash",
+            "gemini-2.5-pro",
+            "gemini-2.5-flash-lite",
+            "gemini-2.0-flash",
+        ],
+    ),
     "openrouter": Provider(
         key="openrouter",
         label="OpenRouter",

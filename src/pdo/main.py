@@ -107,7 +107,7 @@ logger = logging.getLogger("pdo.main")
 # both the autocomplete menu and the /help panel so they never drift apart.
 _COMMANDS: dict[str, str] = {
     "/help": "Show this help",
-    "/models": "Switch provider and model (OpenAI / Anthropic / OpenRouter / Ollama)",
+    "/models": "Switch provider and model (OpenAI / Anthropic / Gemini / OpenRouter / Ollama)",
     "/tools": "List available tools",
     "/index": "Build/refresh the codebase search index for this directory",
     "/mcp": "Show connected MCP servers and their tools",
